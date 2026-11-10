@@ -9,15 +9,15 @@
   "description": "Mcan Sigara Takip ve İstatistik Asistanı",
   "icons": [
     {
-      "src": "https://i.pinimg.com/736x/f5/a9/1a/f5a91afa0e2dd062445e684106faac1e.jpg",
+      "src": "./logo.png",
       "sizes": "192x192",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://i.pinimg.com/736x/f5/a9/1a/f5a91afa0e2dd062445e684106faac1e.jpg",
+      "src": "./logo.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
