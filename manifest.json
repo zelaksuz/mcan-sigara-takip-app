@@ -1,7 +1,15 @@
 {
+  "name": "Mcan",
+  "short_name": "Mcan",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d0e15",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait",
+  "description": "Mcan Sigara Takip ve İstatistik Asistanı",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2933/2933116.png",
+      "src": "https://i.pinimg.com/736x/f5/a9/1a/f5a91afa0e2dd062445e684106faac1e.jpg",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
