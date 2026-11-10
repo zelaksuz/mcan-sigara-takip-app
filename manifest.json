@@ -5,10 +5,12 @@
   "display": "standalone",
   "background_color": "#0d0e15",
   "theme_color": "#7c3aed",
+  "orientation": "portrait",
+  "description": "MCAN Sigara Takip ve İstatistik Asistanı",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2933/2933116.png",
-      "sizes": "192x192",
+      "src": "https://cdn-icons-png.flaticon.com/512/3076/3076135.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
