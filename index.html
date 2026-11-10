@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCAN Sigara Takip</title>
+    
+    <!-- Bağımsız Uygulama (PWA) Ayarları -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0d0e15;
+            color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6 pb-16">
+
+    <!-- Ana Konteyner -->
+    <div class="w-full max-w-md min-h-[580px] bg-[#13151f] border border-[#1f2233] rounded-3xl p-6 shadow-2xl flex flex-col gap-6">
+        
+        <!-- Üst Sekme Navigasyonu -->
+        <div class="flex w-full bg-[#1a1d2d] p-1.5 rounded-2xl border border-[#262a40]">
+            <button onclick="switchTab('home')" id="tabHomeBtn" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md">
+                🏠 Takip
+            </button>
+            <button onclick="switchTab('history')" id="tabHistoryBtn" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400 hover:text-white">
+                📊 Geçmiş Raporu
+            </button>
+        </div>
+
+        <!-- SEKME 1: ANA SAYFA (TAKİP) -->
+        <div id="sectionHome" class="flex flex-col gap-5 flex-1">
+            
+            <!-- Üst Başlık / Logo -->
+            <div class="flex flex-col items-center justify-center text-center gap-2 mt-1">
+                <div class="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-600/30 text-white font-bold text-xl">
+                    M
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">MCAN</h1>
+                    <p class="text-xs text-gray-400">Sigara Takip Asistanı</p>
+                </div>
+            </div>
+
+            <!-- Günlük Sayaç Kartı -->
+            <div class="bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 text-center flex flex-col gap-1">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Bugünkü Toplam</span>
+                <div id="dailyCount" class="text-4xl font-extrabold text-purple-400 my-1">0</div>
+                <span class="text-xs text-gray-500">adet içildi</span>
+            </div>
+
+            <!-- Ana İşlem Butonu -->
+            <button onclick="addSmoke()" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-2xl shadow-lg shadow-purple-600/25 transition-all transform active:scale-95 flex items-center justify-center gap-2 text-base">
+                <span>🚬 SİGARA İÇTİM (KAYDET)</span>
+            </button>
+
+            <!-- Paket Butonları -->
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="startNewPack()" class="py-3 px-4 bg-[#1a1d2d] hover:bg-[#22263a] border border-[#262a40] text-gray-300 text-xs font-medium rounded-xl transition-all flex items-center justify-center gap-2">
+                    <span>📦 Yeni Paket Başladım</span>
+                </button>
+                <button onclick="endPack()" class="py-3 px-4 bg-[#1a1d2d] hover:bg-[#22263a] border border-[#262a40] text-gray-300 text-xs font-medium rounded-xl transition-all flex items-center justify-center gap-2">
+                    <span>🛑 Paket Bitti</span>
+                </button>
+            </div>
+
+            <!-- Son İşlemler / Saatler -->
+            <div class="bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 flex flex-col gap-3 flex-1">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
+                        ⏱️ Bugünün Saatleri
+                    </span>
+                </div>
+                <div id="historyList" class="flex flex-col gap-2 max-h-32 overflow-y-auto pr-1 text-xs text-gray-400">
+                    <div class="text-center py-3 text-gray-500 italic">Bugün henüz kayıt yok.</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SEKME 2: GEÇMİŞ RAPORU (AYRI SEKME) -->
+        <div id="sectionHistory" class="flex flex-col gap-4 flex-1 hidden">
+            <div class="flex justify-between items-center px-1">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                    📊 Günlük Geçmiş Raporu
+                </h2>
+                <button onclick="clearHistory()" class="text-xs font-medium text-red-400 hover:text-red-300 transition-colors bg-red-950/30 border border-red-900/50 px-2.5 py-1 rounded-lg">
+                    Tümünü Sıfırla
+                </button>
+            </div>
+
+            <div class="bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 flex flex-col gap-2 flex-1">
+                <div id="dailyStatsList" class="flex flex-col gap-2.5 max-h-80 overflow-y-auto pr-1 text-xs text-gray-300">
+                    <div class="text-center py-12 text-gray-500 italic">Geçmiş veri bulunmuyor.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript Mantığı -->
+    <script>
+        let records = JSON.parse(localStorage.getItem('mcan_smoke_records')) || [];
+
+        function switchTab(tab) {
+            const homeSec = document.getElementById('sectionHome');
+            const historySec = document.getElementById('sectionHistory');
+            const homeBtn = document.getElementById('tabHomeBtn');
+            const historyBtn = document.getElementById('tabHistoryBtn');
+
+            if (tab === 'home') {
+                homeSec.classList.remove('hidden');
+                historySec.classList.add('hidden');
+                homeBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md';
+                historyBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400 hover:text-white';
+            } else {
+                homeSec.classList.add('hidden');
+                historySec.classList.remove('hidden');
+                historyBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md';
+                homeBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400 hover:text-white';
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            const listEl = document.getElementById('historyList');
+            const countEl = document.getElementById('dailyCount');
+            const statsEl = document.getElementById('dailyStatsList');
+
+            const todayStr = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            const todaySmokes = records.filter(r => r.type === 'smoke' && r.fullDate === todayStr);
+            countEl.textContent = todaySmokes.length;
+
+            const todayRecords = records.filter(r => r.fullDate === todayStr);
+            if (todayRecords.length === 0) {
+                listEl.innerHTML = '<div class="text-center py-3 text-gray-500 italic">Bugün henüz kayıt yok.</div>';
+            } else {
+                listEl.innerHTML = '';
+                [...todayRecords].reverse().forEach(record => {
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center py-2 px-3 bg-[#13151f] rounded-xl border border-[#22263a]';
+                    if (record.type === 'smoke') {
+                        item.innerHTML = `<span class="text-amber-400 font-semibold flex items-center gap-1.5">🚬 Sigara İçildi</span><span class="text-gray-500">${record.time}</span>`;
+                    } else {
+                        item.innerHTML = `<span style="color: ${record.color};" class="font-semibold">${record.text}</span><span class="text-gray-500">${record.time}</span>`;
+                    }
+                    listEl.appendChild(item);
+                });
+            }
+
+            const smokeOnly = records.filter(r => r.type === 'smoke');
+            const statsMap = {};
+            smokeOnly.forEach(r => {
+                statsMap[r.fullDate] = (statsMap[r.fullDate] || 0) + 1;
+            });
+
+            const dates = Object.keys(statsMap).reverse();
+            if (dates.length === 0) {
+                statsEl.innerHTML = '<div class="text-center py-12 text-gray-500 italic">Geçmiş veri bulunmuyor.</div>';
+            } else {
+                statsEl.innerHTML = '';
+                dates.forEach(date => {
+                    const count = statsMap[date];
+                    const item = document.createElement('div');
+                    item.className = 'flex justify-between items-center py-3 px-3.5 bg-[#13151f] rounded-xl border border-[#22263a]';
+                    item.innerHTML = `<span class="text-gray-300 font-medium">${date}</span><span class="bg-purple-900/40 text-purple-300 px-3 py-1 rounded-lg font-bold">${count} adet</span>`;
+                    statsEl.appendChild(item);
+                });
+            }
+        }
+
+        function addSmoke() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            const fullDateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            records.push({ type: 'smoke', time: timeStr, fullDate: fullDateStr });
+            localStorage.setItem('mcan_smoke_records', JSON.stringify(records));
+            updateUI();
+        }
+
+        function startNewPack() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            const fullDateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            records.push({ type: 'note', text: '📦 Yeni Paket Başlandı', color: '#34d399', time: timeStr, fullDate: fullDateStr });
+            localStorage.setItem('mcan_smoke_records', JSON.stringify(records));
+            updateUI();
+        }
+
+        function endPack() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            const fullDateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            records.push({ type: 'note', text: '🛑 Paket Bitti', color: '#f87171', time: timeStr, fullDate: fullDateStr });
+            localStorage.setItem('mcan_smoke_records', JSON.stringify(records));
+            updateUI();
+        }
+
+        function clearHistory() {
+            if (confirm('Tüm geçmiş kayıtları silmek istediğine emin misin?')) {
+                records = [];
+                localStorage.removeItem('mcan_smoke_records');
+                updateUI();
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
