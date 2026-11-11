@@ -26,7 +26,17 @@
             transition: background-color 0.3s ease;
         }
 
-        /* Özel İnce ve Şık Kaydırma Çubuğu (Scrollbar) Tasarımı */
+        /* Sayı inputlarındaki yukarı aşağı okları tamamen gizleme */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Özel İnce ve Şık Kaydırma Çubuğu */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -41,9 +51,47 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #7c3aed;
         }
+
+        /* AÇILIŞ ANİMASYONU CSS EFEKTLERİ */
+        #splashScreen {
+            position: fixed;
+            inset: 0;
+            background-color: #0d0e15;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .splash-logo {
+            animation: pulseGlow 1.2s infinite alternate ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+            }
+            100% {
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(124, 58, 237, 0.7);
+            }
+        }
     </style>
 </head>
 <body id="bodyRoot" class="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6 pb-16">
+
+    <!-- AÇILIŞ ANİMASYONU EKRANI (SPLASH SCREEN) -->
+    <div id="splashScreen">
+        <div class="splash-logo w-24 h-24 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-[2.5rem] flex items-center justify-center text-white font-extrabold text-4xl shadow-2xl">
+            M
+        </div>
+        <div class="text-center">
+            <h1 class="text-lg font-bold tracking-wider text-white">MCAN SİSTEMLERİ</h1>
+            <p class="text-xs text-purple-400 font-semibold tracking-widest mt-1">YÜKLENİYOR...</p>
+        </div>
+    </div>
 
     <!-- Ana Konteyner -->
     <div id="mainContainer" class="w-full max-w-md min-h-[760px] bg-[#13151f] border border-[#1f2233] rounded-3xl p-6 shadow-2xl flex flex-col gap-6 relative transition-colors duration-300">
@@ -68,25 +116,25 @@
         </div>
 
         <!-- SEKME 0: ANA EKRAN -->
-        <div id="sectionMain" class="flex flex-col items-center justify-between flex-1 py-6 text-center gap-4">
-            <div class="flex flex-col items-center gap-3 mt-2">
-                <div class="w-16 h-16 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-purple-600/40 text-white font-bold text-2xl">
+        <div id="sectionMain" class="flex flex-col items-center justify-between flex-1 py-4 text-center gap-4">
+            <div class="flex flex-col items-center gap-3 mt-1">
+                <div class="w-20 h-20 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-purple-600/40 text-white font-bold text-3xl">
                     M
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold tracking-tight text-white mb-1">Hoş Geldin Mehmet Can</h1>
-                    <p class="text-[10px] tracking-widest text-purple-400 font-bold uppercase">İMPARATOR</p>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-white mb-1">Hoş Geldin Mehmet Can</h1>
+                    <p class="text-xs tracking-widest text-purple-400 font-bold uppercase">İMPARATOR</p>
                 </div>
             </div>
 
             <!-- Tema Seçici -->
-            <div class="w-full bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 flex flex-col gap-3 text-left">
-                <span class="text-xs font-semibold text-gray-300 flex items-center gap-1.5">🎨 Tema Seçenekleri</span>
+            <div class="w-full bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 flex flex-col gap-3 text-left shadow-lg">
+                <span class="text-xs font-bold text-gray-200 flex items-center gap-1.5">🎨 Tema Seçenekleri</span>
                 <div class="grid grid-cols-4 gap-2">
-                    <button onclick="setTheme('default')" class="py-2 bg-[#13151f] border border-purple-600/50 hover:bg-purple-950/30 text-purple-300 text-[11px] font-semibold rounded-xl transition-all">Mor</button>
-                    <button onclick="setTheme('oled')" class="py-2 bg-black border border-gray-800 hover:border-gray-600 text-gray-300 text-[11px] font-semibold rounded-xl transition-all">OLED</button>
-                    <button onclick="setTheme('blue')" class="py-2 bg-[#13151f] border border-blue-600/50 hover:bg-blue-950/30 text-blue-300 text-[11px] font-semibold rounded-xl transition-all">Mavi</button>
-                    <button onclick="setTheme('green')" class="py-2 bg-[#13151f] border border-emerald-600/50 hover:bg-emerald-950/30 text-emerald-300 text-[11px] font-semibold rounded-xl transition-all">Yeşil</button>
+                    <button onclick="setTheme('default')" class="py-2.5 bg-[#13151f] border border-purple-600/50 hover:bg-purple-950/30 text-purple-300 text-xs font-bold rounded-xl transition-all">Mor</button>
+                    <button onclick="setTheme('oled')" class="py-2.5 bg-black border border-gray-800 hover:border-gray-600 text-gray-300 text-xs font-bold rounded-xl transition-all">OLED</button>
+                    <button onclick="setTheme('blue')" class="py-2.5 bg-[#13151f] border border-blue-600/50 hover:bg-blue-950/30 text-blue-300 text-xs font-bold rounded-xl transition-all">Mavi</button>
+                    <button onclick="setTheme('green')" class="py-2.5 bg-[#13151f] border border-emerald-600/50 hover:bg-emerald-950/30 text-emerald-300 text-xs font-bold rounded-xl transition-all">Yeşil</button>
                 </div>
             </div>
 
@@ -303,6 +351,15 @@
 
     <!-- JavaScript Mantığı -->
     <script>
+        // Sayfa yüklendiğinde açılış animasyonunu 0.8 saniye gösterip kaldırıyoruz
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splashScreen');
+                splash.style.opacity = '0';
+                splash.style.visibility = 'hidden';
+            }, 800);
+        });
+
         let records = JSON.parse(localStorage.getItem('mcan_smoke_records')) || [];
         
         let nakitBakiye = parseFloat(localStorage.getItem('mcan_nakit_bakiye')) || 0;
@@ -328,6 +385,7 @@
             const root = document.getElementById('bodyRoot');
             const container = document.getElementById('mainContainer');
             const navBar = document.getElementById('navBar');
+            const splash = document.getElementById('splashScreen');
 
             if (themeName === 'oled') {
                 root.style.setProperty('--bg-color', '#000000');
@@ -335,24 +393,28 @@
                 container.style.borderColor = '#1f1f1f';
                 navBar.style.backgroundColor = '#0a0a0a';
                 navBar.style.borderColor = '#1f1f1f';
+                splash.style.backgroundColor = '#000000';
             } else if (themeName === 'blue') {
                 root.style.setProperty('--bg-color', '#090d16');
                 container.style.backgroundColor = '#0f172a';
                 container.style.borderColor = '#1e293b';
                 navBar.style.backgroundColor = '#131f33';
                 navBar.style.borderColor = '#1e293b';
+                splash.style.backgroundColor = '#090d16';
             } else if (themeName === 'green') {
                 root.style.setProperty('--bg-color', '#07110d');
                 container.style.backgroundColor = '#0e1f18';
                 container.style.borderColor = '#173026';
                 navBar.style.backgroundColor = '#12261e';
                 navBar.style.borderColor = '#173026';
+                splash.style.backgroundColor = '#07110d';
             } else {
                 root.style.setProperty('--bg-color', '#0d0e15');
                 container.style.backgroundColor = '#13151f';
                 container.style.borderColor = '#1f2233';
                 navBar.style.backgroundColor = '#1a1d2d';
                 navBar.style.borderColor = '#262a40';
+                splash.style.backgroundColor = '#0d0e15';
             }
         }
 
@@ -759,7 +821,6 @@
             document.getElementById('customModal').classList.add('hidden');
         }
 
-        // Şık Özel Uyarı Modalı (Tarayıcı alerti yerine)
         function showWarningModal(mesaj) {
             const modal = document.getElementById('customModal');
             const iconEl = document.getElementById('modalIcon');
@@ -779,11 +840,9 @@
             titleEl.textContent = 'Yetersiz Bakiye';
             descEl.textContent = mesaj;
             
-            // Sadece Tamam butonu göster (İptal gizlenir veya tek buton yapılır)
             confirmBtn.textContent = 'Anladım';
             confirmBtn.onclick = () => {
                 closeCustomModal();
-                // Modalı eski haline getir
                 confirmBtn.textContent = 'Tamam';
                 confirmBtn.onclick = modalConfirmAction;
             };
@@ -843,7 +902,6 @@
                     return;
                 }
 
-                // YETERSİZ BAKİYE KONTROLÜ (Nakit ve Banka için)
                 if (currentModalAction === 'sub' || currentModalAction === 'spend') {
                     if (hesapTuru === 'nakit' && miktar > nakitBakiye) {
                         showWarningModal("Kanka nakit kasada o kadar para yok! İşlem yapılamadı.");
