@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCAN Sigara Takip</title>
+    <title>MCAN Sigara & Bütçe Takip</title>
     
     <!-- Bağımsız Uygulama (PWA) Ayarları -->
     <link rel="manifest" href="manifest.json">
@@ -21,27 +21,71 @@
             background-color: #0d0e15;
             color: #f3f4f6;
         }
+
+        /* Özel İnce ve Şık Kaydırma Çubuğu (Scrollbar) Tasarımı */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #13151f;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262a40;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7c3aed;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6 pb-16">
 
     <!-- Ana Konteyner -->
-    <div class="w-full max-w-md min-h-[580px] bg-[#13151f] border border-[#1f2233] rounded-3xl p-6 shadow-2xl flex flex-col gap-6">
+    <div class="w-full max-w-md min-h-[680px] bg-[#13151f] border border-[#1f2233] rounded-3xl p-6 shadow-2xl flex flex-col gap-6 relative">
         
-        <!-- Üst Sekme Navigasyonu -->
-        <div class="flex w-full bg-[#1a1d2d] p-1.5 rounded-2xl border border-[#262a40]">
-            <button onclick="switchTab('home')" id="tabHomeBtn" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md">
-                🏠 Takip
+        <!-- Üst 5'li Sekme Navigasyonu -->
+        <div class="grid grid-cols-5 w-full bg-[#1a1d2d] p-1.5 rounded-2xl border border-[#262a40] gap-1">
+            <button onclick="switchTab('main')" id="tabMainBtn" class="py-2 text-[10px] font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md text-center truncate">
+                🏠 Ana
             </button>
-            <button onclick="switchTab('history')" id="tabHistoryBtn" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400 hover:text-white">
-                📊 Geçmiş Raporu
+            <button onclick="switchTab('home')" id="tabHomeBtn" class="py-2 text-[10px] font-bold rounded-xl transition-all text-gray-400 hover:text-white text-center truncate">
+                🚬 Takip
+            </button>
+            <button onclick="switchTab('history')" id="tabHistoryBtn" class="py-2 text-[10px] font-bold rounded-xl transition-all text-gray-400 hover:text-white text-center truncate">
+                📊 Geçmiş
+            </button>
+            <button onclick="switchTab('budget')" id="tabBudgetBtn" class="py-2 text-[10px] font-bold rounded-xl transition-all text-gray-400 hover:text-white text-center truncate">
+                💰 Bütçe
+            </button>
+            <button onclick="switchTab('logs')" id="tabLogsBtn" class="py-2 text-[10px] font-bold rounded-xl transition-all text-gray-400 hover:text-white text-center truncate">
+                📜 Loglar
             </button>
         </div>
 
+        <!-- SEKME 0: ANA EKRAN -->
+        <div id="sectionMain" class="flex flex-col items-center justify-between flex-1 py-12 text-center">
+            <div class="flex flex-col items-center gap-4 mt-6">
+                <div class="w-20 h-20 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-purple-600/40 text-white font-bold text-3xl">
+                    M
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight text-white mb-1">Hoş Geldin Mehmet Can</h1>
+                    <p class="text-xs tracking-widest text-purple-400 font-bold uppercase">İMPARATOR</p>
+                </div>
+            </div>
+
+            <div class="bg-[#1a1d2d]/80 border border-[#262a40] rounded-2xl p-6 w-full shadow-lg my-auto">
+                <p class="text-sm font-medium text-purple-300 italic leading-relaxed">"Hatırlamak için değil, Hatırlatmak için geldim"</p>
+            </div>
+
+            <div class="text-[11px] text-gray-500 pb-2">
+                MCAN Sistemleri © 2026
+            </div>
+        </div>
+
         <!-- SEKME 1: ANA SAYFA (TAKİP) -->
-        <div id="sectionHome" class="flex flex-col gap-5 flex-1">
-            
-            <!-- Üst Başlık / Logo -->
+        <div id="sectionHome" class="flex flex-col gap-5 flex-1 hidden">
             <div class="flex flex-col items-center justify-center text-center gap-2 mt-1">
                 <div class="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-600/30 text-white font-bold text-xl">
                     M
@@ -52,83 +96,211 @@
                 </div>
             </div>
 
-            <!-- Günlük Sayaç Kartı -->
             <div class="bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 text-center flex flex-col gap-1">
-                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Bugünkü Toplam</span>
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">BUGÜNKÜ TOPLAM</span>
+                    <span id="currentDayName" class="text-[10px] font-bold bg-purple-950/60 text-purple-300 px-2 py-0.5 rounded-md border border-purple-900/50 uppercase">---</span>
+                </div>
                 <div id="dailyCount" class="text-4xl font-extrabold text-purple-400 my-1">0</div>
                 <span class="text-xs text-gray-500">adet içildi</span>
             </div>
 
-            <!-- Ana İşlem Butonu -->
             <button onclick="addSmoke()" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-2xl shadow-lg shadow-purple-600/25 transition-all transform active:scale-95 flex items-center justify-center gap-2 text-base">
-                <span>🚬 SİGARA İÇTİM (KAYDET)</span>
+                <span>🚬 SİGARA İÇTİM</span>
             </button>
 
-            <!-- Paket Butonları -->
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="startNewPack()" class="py-3 px-4 bg-[#1a1d2d] hover:bg-[#22263a] border border-[#262a40] text-gray-300 text-xs font-medium rounded-xl transition-all flex items-center justify-center gap-2">
+                <button onclick="startNewPack()" class="py-3 px-4 bg-emerald-950/30 hover:bg-emerald-900/40 border border-emerald-900/50 text-emerald-300 text-xs font-semibold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2">
                     <span>📦 Yeni Paket Başladım</span>
                 </button>
-                <button onclick="endPack()" class="py-3 px-4 bg-[#1a1d2d] hover:bg-[#22263a] border border-[#262a40] text-gray-300 text-xs font-medium rounded-xl transition-all flex items-center justify-center gap-2">
+                <button onclick="endPack()" class="py-3 px-4 bg-rose-950/30 hover:bg-rose-900/40 border border-rose-900/50 text-rose-300 text-xs font-semibold rounded-2xl transition-all shadow-md flex items-center justify-center gap-2">
                     <span>🛑 Paket Bitti</span>
                 </button>
             </div>
 
-            <!-- Son İşlemler / Saatler -->
             <div class="bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 flex flex-col gap-3 flex-1">
                 <div class="flex justify-between items-center">
                     <span class="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
                         ⏱️ Bugünün Saatleri
                     </span>
+                    <button onclick="openTodayModal()" class="text-[11px] font-medium text-red-400 hover:text-red-300 transition-colors bg-red-950/30 border border-red-900/50 px-2 py-0.5 rounded-lg">
+                        Tümünü Sil
+                    </button>
                 </div>
-                <div id="historyList" class="flex flex-col gap-2 max-h-32 overflow-y-auto pr-1 text-xs text-gray-400">
+                <div id="historyList" class="flex flex-col gap-2 max-h-36 overflow-y-auto pr-1 text-xs text-gray-400">
                     <div class="text-center py-3 text-gray-500 italic">Bugün henüz kayıt yok.</div>
                 </div>
             </div>
-
         </div>
 
-        <!-- SEKME 2: GEÇMİŞ RAPORU (AYRI SEKME) -->
+        <!-- SEKME 2: GEÇMİŞ RAPORU -->
         <div id="sectionHistory" class="flex flex-col gap-4 flex-1 hidden">
             <div class="flex justify-between items-center px-1">
                 <h2 class="text-sm font-bold text-white flex items-center gap-2">
                     📊 Günlük Geçmiş Raporu
                 </h2>
-                <button onclick="clearHistory()" class="text-xs font-medium text-red-400 hover:text-red-300 transition-colors bg-red-950/30 border border-red-900/50 px-2.5 py-1 rounded-lg">
+                <button onclick="openHistoryModal()" class="text-xs font-medium text-red-400 hover:text-red-300 transition-colors bg-red-950/30 border border-red-900/50 px-2.5 py-1 rounded-lg">
                     Tümünü Sıfırla
                 </button>
             </div>
 
             <div class="bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 flex flex-col gap-2 flex-1">
-                <div id="dailyStatsList" class="flex flex-col gap-2.5 max-h-80 overflow-y-auto pr-1 text-xs text-gray-300">
+                <div id="dailyStatsList" class="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1.5 text-xs text-gray-300">
                     <div class="text-center py-12 text-gray-500 italic">Geçmiş veri bulunmuyor.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEKME 3: BÜTÇE VE HARCAMA KUTULARI -->
+        <div id="sectionBudget" class="flex flex-col gap-4 flex-1 hidden">
+            <div class="flex justify-between items-center px-1">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                    💰 Cüzdan & Harcama Takibi
+                </h2>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="openBudgetModal('zeroBalance')" class="text-[10px] font-medium text-amber-400 hover:text-amber-300 transition-colors bg-amber-950/30 border border-amber-900/50 px-2 py-1 rounded-lg">
+                        Bakiyeyi Sıfırla
+                    </button>
+                    <button onclick="openBudgetModal('clear')" class="text-[10px] font-medium text-red-400 hover:text-red-300 transition-colors bg-red-950/30 border border-red-900/50 px-2 py-1 rounded-lg">
+                        Tümünü Sıfırla
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 text-center flex flex-col gap-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Güncel Kalan Para</span>
+                <div id="anaBakiye" class="text-3xl font-extrabold text-green-400 my-0.5">0.00 TL</div>
+                <div class="grid grid-cols-2 gap-2 mt-1">
+                    <button onclick="openBudgetModal('add')" class="py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-1">
+                        <span>➕ Para Geldi</span>
+                    </button>
+                    <button onclick="openBudgetModal('sub')" class="py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-1">
+                        <span>❌ Para Eksilt</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="openBudgetModal('spend', '🚬 Sigara')" class="py-2.5 px-2 bg-red-950/40 hover:bg-red-900/40 border border-red-900/50 text-red-300 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1">
+                    <span>🚬 Sigara</span>
+                </button>
+                <button onclick="openBudgetModal('spend', '☕ Kahve')" class="py-2.5 px-2 bg-amber-950/40 hover:bg-amber-900/40 border border-amber-900/50 text-amber-300 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1">
+                    <span>☕ Kahve</span>
+                </button>
+                <button onclick="openBudgetModal('spend', '⚡ Gereksiz')" class="py-2.5 px-2 bg-purple-950/40 hover:bg-purple-900/40 border border-purple-900/50 text-purple-300 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1">
+                    <span>⚡ Gereksiz</span>
+                </button>
+            </div>
+
+            <div class="bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 flex flex-col gap-3 flex-1">
+                <span class="text-xs font-semibold text-gray-300">📜 Bütçe İşlem Geçmişi</span>
+                <div id="butceGecmisiList" class="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1 text-xs text-gray-400">
+                    <div class="text-center py-3 text-gray-500 italic">Henüz işlem yapılmadı.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEKME 4: SİLİNEN İŞLEM LOGLARI -->
+        <div id="sectionLogs" class="flex flex-col gap-4 flex-1 hidden">
+            <div class="flex justify-between items-center px-1">
+                <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                    📜 Silinen İşlem Logları
+                </h2>
+                <button onclick="clearAllLogs()" class="text-[10px] font-medium text-red-400 hover:text-red-300 transition-colors bg-red-950/30 border border-red-900/50 px-2 py-1 rounded-lg">
+                    Logları Temizle
+                </button>
+            </div>
+
+            <div class="bg-[#1a1d2d] border border-[#262a40] rounded-2xl p-4 flex flex-col gap-2.5 flex-1">
+                <div id="logsList" class="flex flex-col gap-2.5 max-h-[420px] overflow-y-auto pr-1.5 text-xs text-gray-300">
+                    <div class="text-center py-12 text-gray-500 italic">Henüz silinen işlem yok.</div>
                 </div>
             </div>
         </div>
 
     </div>
 
+    <!-- ÖZEL ŞIK MODAL -->
+    <div id="customModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-[#1a1d2d] border border-[#262a40] rounded-3xl p-6 w-full max-w-xs shadow-2xl flex flex-col gap-4 text-center">
+            <div id="modalIcon" class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto text-xl font-bold">
+                ⚠️
+            </div>
+            <div>
+                <h3 id="modalTitle" class="text-sm font-bold text-white mb-1">İşlem</h3>
+                <p id="modalDesc" class="text-xs text-gray-400 leading-relaxed">Açıklama</p>
+            </div>
+            
+            <div id="modalInputContainer" class="hidden">
+                <input type="number" id="modalInput" placeholder="Miktar (TL)" class="w-full bg-[#13151f] border border-[#262a40] rounded-xl px-4 py-2.5 text-center text-white text-sm focus:outline-none focus:border-purple-600">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-2">
+                <button onclick="closeCustomModal()" class="py-2.5 bg-[#13151f] hover:bg-[#22263a] border border-[#262a40] text-gray-300 font-semibold text-xs rounded-xl transition-all">
+                    İptal
+                </button>
+                <button id="modalConfirmBtn" onclick="modalConfirmAction()" class="py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition-all shadow-md">
+                    Tamam
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Mantığı -->
     <script>
         let records = JSON.parse(localStorage.getItem('mcan_smoke_records')) || [];
+        let toplamBakiye = parseFloat(localStorage.getItem('mcan_bakiye')) || 0;
+        let butceGecmisi = JSON.parse(localStorage.getItem('mcan_butce_gecmis')) || [];
+        let deletedLogs = JSON.parse(localStorage.getItem('mcan_deleted_logs')) || [];
+        let currentModalAction = null;
+        let currentCategory = null;
+        let selectedBudgetId = null;
+        let selectedRecordId = null;
 
         function switchTab(tab) {
+            const mainSec = document.getElementById('sectionMain');
             const homeSec = document.getElementById('sectionHome');
             const historySec = document.getElementById('sectionHistory');
+            const budgetSec = document.getElementById('sectionBudget');
+            const logsSec = document.getElementById('sectionLogs');
+
+            const mainBtn = document.getElementById('tabMainBtn');
             const homeBtn = document.getElementById('tabHomeBtn');
             const historyBtn = document.getElementById('tabHistoryBtn');
+            const budgetBtn = document.getElementById('tabBudgetBtn');
+            const logsBtn = document.getElementById('tabLogsBtn');
 
-            if (tab === 'home') {
+            mainSec.classList.add('hidden');
+            homeSec.classList.add('hidden');
+            historySec.classList.add('hidden');
+            budgetSec.classList.add('hidden');
+            logsSec.classList.add('hidden');
+
+            mainBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all text-gray-400 hover:text-white text-center truncate';
+            homeBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all text-gray-400 hover:text-white text-center truncate';
+            historyBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all text-gray-400 hover:text-white text-center truncate';
+            budgetBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all text-gray-400 hover:text-white text-center truncate';
+            logsBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all text-gray-400 hover:text-white text-center truncate';
+
+            if (tab === 'main') {
+                mainSec.classList.remove('hidden');
+                mainBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md text-center truncate';
+            } else if (tab === 'home') {
                 homeSec.classList.remove('hidden');
-                historySec.classList.add('hidden');
-                homeBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md';
-                historyBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400 hover:text-white';
-            } else {
-                homeSec.classList.add('hidden');
-                historySec.classList.remove('hidden');
-                historyBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md';
-                homeBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-gray-400 hover:text-white';
+                homeBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md text-center truncate';
                 updateUI();
+            } else if (tab === 'history') {
+                historySec.classList.remove('hidden');
+                historyBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md text-center truncate';
+                updateUI();
+            } else if (tab === 'budget') {
+                budgetSec.classList.remove('hidden');
+                budgetBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md text-center truncate';
+                butceEkraniniGuncelle();
+            } else if (tab === 'logs') {
+                logsSec.classList.remove('hidden');
+                logsBtn.className = 'py-2 text-[10px] font-bold rounded-xl transition-all bg-purple-600 text-white shadow-md text-center truncate';
+                logsEkraniniGuncelle();
             }
         }
 
@@ -136,6 +308,11 @@
             const listEl = document.getElementById('historyList');
             const countEl = document.getElementById('dailyCount');
             const statsEl = document.getElementById('dailyStatsList');
+            const dayNameEl = document.getElementById('currentDayName');
+
+            const options = { weekday: 'long' };
+            const gunAdi = new Date().toLocaleDateString('tr-TR', options);
+            dayNameEl.textContent = gunAdi;
 
             const todayStr = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
             
@@ -148,21 +325,42 @@
             } else {
                 listEl.innerHTML = '';
                 [...todayRecords].reverse().forEach(record => {
+                    if (!record.id) record.id = Math.random();
+
                     const item = document.createElement('div');
-                    item.className = 'flex justify-between items-center py-2 px-3 bg-[#13151f] rounded-xl border border-[#22263a]';
+                    item.className = 'flex justify-between items-center py-2 px-3 bg-[#13151f] rounded-xl border border-[#22263a] gap-2';
+                    
                     if (record.type === 'smoke') {
-                        item.innerHTML = `<span class="text-amber-400 font-semibold flex items-center gap-1.5">🚬 Sigara İçildi</span><span class="text-gray-500">${record.time}</span>`;
+                        item.innerHTML = `
+                            <div class="flex items-center gap-2 truncate">
+                                <button onclick="confirmRemoveRecordItem(${record.id})" class="w-6 h-6 bg-red-950/60 hover:bg-red-900 border border-red-900/50 text-red-400 rounded-lg flex items-center justify-center font-bold text-xs transition-all shrink-0" title="Bu kaydı sil">✕</button>
+                                <span class="text-amber-400 font-semibold flex items-center gap-1.5 truncate">🚬 Sigara İçildi</span>
+                            </div>
+                            <span class="text-gray-500 shrink-0">${record.time}</span>
+                        `;
                     } else {
-                        item.innerHTML = `<span style="color: ${record.color};" class="font-semibold">${record.text}</span><span class="text-gray-500">${record.time}</span>`;
+                        item.innerHTML = `
+                            <div class="flex items-center gap-2 truncate">
+                                <button onclick="confirmRemoveRecordItem(${record.id})" class="w-6 h-6 bg-red-950/60 hover:bg-red-900 border border-red-900/50 text-red-400 rounded-lg flex items-center justify-center font-bold text-xs transition-all shrink-0" title="Bu kaydı sil">✕</button>
+                                <span style="color: ${record.color};" class="font-semibold truncate">${record.text}</span>
+                            </div>
+                            <span class="text-gray-500 shrink-0">${record.time}</span>
+                        `;
                     }
                     listEl.appendChild(item);
                 });
             }
 
-            const smokeOnly = records.filter(r => r.type === 'smoke');
             const statsMap = {};
-            smokeOnly.forEach(r => {
-                statsMap[r.fullDate] = (statsMap[r.fullDate] || 0) + 1;
+            records.forEach(r => {
+                if (!statsMap[r.fullDate]) {
+                    statsMap[r.fullDate] = { smokes: 0, notes: [] };
+                }
+                if (r.type === 'smoke') {
+                    statsMap[r.fullDate].smokes++;
+                } else if (r.type === 'note') {
+                    statsMap[r.fullDate].notes.push(r);
+                }
             });
 
             const dates = Object.keys(statsMap).reverse();
@@ -170,11 +368,50 @@
                 statsEl.innerHTML = '<div class="text-center py-12 text-gray-500 italic">Geçmiş veri bulunmuyor.</div>';
             } else {
                 statsEl.innerHTML = '';
-                dates.forEach(date => {
-                    const count = statsMap[date];
+                dates.forEach(dateStr => {
+                    const data = statsMap[dateStr];
+                    
+                    let tarihParcalari = dateStr.split(' ');
+                    let gunAdiText = "";
+                    try {
+                        const ayMap = { 'Oca': 0, 'Şub': 1, 'Mar': 2, 'Nis': 3, 'May': 4, 'Haz': 5, 'Tem': 6, 'Ağu': 7, 'Eyl': 8, 'Eki': 9, 'Kas': 10, 'Ara': 11 };
+                        let g = parseInt(tarihParcalari[0]);
+                        let a = ayMap[tarihParcalari[1]] || 0;
+                        let y = parseInt(tarihParcalari[2]);
+                        let tarihObj = new Date(y, a, g);
+                        gunAdiText = tarihObj.toLocaleDateString('tr-TR', { weekday: 'long' });
+                    } catch(e) {
+                        gunAdiText = "";
+                    }
+
                     const item = document.createElement('div');
-                    item.className = 'flex justify-between items-center py-3 px-3.5 bg-[#13151f] rounded-xl border border-[#22263a]';
-                    item.innerHTML = `<span class="text-gray-300 font-medium">${date}</span><span class="bg-purple-900/40 text-purple-300 px-3 py-1 rounded-lg font-bold">${count} adet</span>`;
+                    item.className = 'flex flex-col py-3 px-3.5 bg-[#13151f] rounded-2xl border border-[#22263a] gap-2.5';
+                    
+                    let htmlContent = `
+                        <div class="flex justify-between items-center border-b border-[#22263a] pb-2">
+                            <div class="flex flex-col">
+                                <span class="text-gray-200 font-bold text-xs">${dateStr}</span>
+                                <span class="text-purple-400 text-[10px] font-bold uppercase">${gunAdiText}</span>
+                            </div>
+                            <span class="bg-purple-900/40 text-purple-300 px-3 py-1 rounded-lg font-bold text-xs">${data.smokes} adet içildi</span>
+                        </div>
+                    `;
+
+                    if (data.notes.length > 0) {
+                        htmlContent += `<div class="flex flex-col gap-1.5 pt-0.5">`;
+                        data.notes.forEach(note => {
+                            let renkSinif = note.text.includes('Başlandı') ? 'text-emerald-400 bg-emerald-950/30 border-emerald-900/40' : 'text-rose-400 bg-rose-950/30 border-rose-900/40';
+                            htmlContent += `
+                                <div class="flex justify-between items-center py-1.5 px-2.5 rounded-xl border ${renkSinif} text-[11px]">
+                                    <span class="font-semibold">${note.text}</span>
+                                    <span class="text-gray-400">${note.time}</span>
+                                </div>
+                            `;
+                        });
+                        htmlContent += `</div>`;
+                    }
+
+                    item.innerHTML = htmlContent;
                     statsEl.appendChild(item);
                 });
             }
@@ -185,7 +422,7 @@
             const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
             const fullDateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
 
-            records.push({ type: 'smoke', time: timeStr, fullDate: fullDateStr });
+            records.push({ id: Date.now(), type: 'smoke', time: timeStr, fullDate: fullDateStr });
             localStorage.setItem('mcan_smoke_records', JSON.stringify(records));
             updateUI();
         }
@@ -195,7 +432,7 @@
             const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
             const fullDateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
 
-            records.push({ type: 'note', text: '📦 Yeni Paket Başlandı', color: '#34d399', time: timeStr, fullDate: fullDateStr });
+            records.push({ id: Date.now(), type: 'note', text: '📦 Yeni Paket Başlandı', color: '#34d399', time: timeStr, fullDate: fullDateStr });
             localStorage.setItem('mcan_smoke_records', JSON.stringify(records));
             updateUI();
         }
@@ -205,16 +442,272 @@
             const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
             const fullDateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
 
-            records.push({ type: 'note', text: '🛑 Paket Bitti', color: '#f87171', time: timeStr, fullDate: fullDateStr });
+            records.push({ id: Date.now(), type: 'note', text: '🛑 Paket Bitti', color: '#f87171', time: timeStr, fullDate: fullDateStr });
             localStorage.setItem('mcan_smoke_records', JSON.stringify(records));
             updateUI();
         }
 
-        function clearHistory() {
-            if (confirm('Tüm geçmiş kayıtları silmek istediğine emin misin?')) {
+        function openTodayModal() {
+            currentModalAction = 'clearToday';
+            const modal = document.getElementById('customModal');
+            const iconEl = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const descEl = document.getElementById('modalDesc');
+            const inputContainer = document.getElementById('modalInputContainer');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            inputContainer.classList.add('hidden');
+            iconEl.className = 'w-12 h-12 bg-red-950/50 border border-red-900/50 rounded-2xl flex items-center justify-center mx-auto text-red-400 text-xl font-bold';
+            iconEl.textContent = '⚠️';
+            titleEl.textContent = 'Bugünkü Kayıtları Sil';
+            descEl.textContent = 'Bugüne ait tüm saat ve paket kayıtlarını silmek istediğine emin misin?';
+            confirmBtn.className = 'py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all shadow-md';
+            modal.classList.remove('hidden');
+        }
+
+        function openHistoryModal() {
+            currentModalAction = 'clearHistory';
+            const modal = document.getElementById('customModal');
+            const iconEl = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const descEl = document.getElementById('modalDesc');
+            const inputContainer = document.getElementById('modalInputContainer');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            inputContainer.classList.add('hidden');
+            iconEl.className = 'w-12 h-12 bg-red-950/50 border border-red-900/50 rounded-2xl flex items-center justify-center mx-auto text-red-400 text-xl font-bold';
+            iconEl.textContent = '⚠️';
+            titleEl.textContent = 'Geçmişi Sıfırla';
+            descEl.textContent = 'Tüm sigara geçmiş kayıtlarını silmek istediğine emin misin?';
+            confirmBtn.className = 'py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all shadow-md';
+            modal.classList.remove('hidden');
+        }
+
+        function confirmRemoveRecordItem(id) {
+            currentModalAction = 'removeSingleRecord';
+            selectedRecordId = id;
+            const modal = document.getElementById('customModal');
+            const iconEl = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const descEl = document.getElementById('modalDesc');
+            const inputContainer = document.getElementById('modalInputContainer');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            inputContainer.classList.add('hidden');
+            iconEl.className = 'w-12 h-12 bg-red-950/50 border border-red-900/50 rounded-2xl flex items-center justify-center mx-auto text-red-400 text-xl font-bold';
+            iconEl.textContent = '⚠️';
+            titleEl.textContent = 'Kaydı Sil';
+            descEl.textContent = 'Bu kaydı silmek istediğine emin misin?';
+            confirmBtn.className = 'py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all shadow-md';
+            modal.classList.remove('hidden');
+        }
+
+        function confirmRemoveBudgetItem(id) {
+            currentModalAction = 'removeSingleBudget';
+            selectedBudgetId = id;
+            const modal = document.getElementById('customModal');
+            const iconEl = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const descEl = document.getElementById('modalDesc');
+            const inputContainer = document.getElementById('modalInputContainer');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            inputContainer.classList.add('hidden');
+            iconEl.className = 'w-12 h-12 bg-red-950/50 border border-red-900/50 rounded-2xl flex items-center justify-center mx-auto text-red-400 text-xl font-bold';
+            iconEl.textContent = '⚠️';
+            titleEl.textContent = 'İşlemi Sil';
+            descEl.textContent = 'Bu bütçe işlemini silmek istediğine emin misin?';
+            confirmBtn.className = 'py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all shadow-md';
+            modal.classList.remove('hidden');
+        }
+
+        function openBudgetModal(action, category = null) {
+            currentModalAction = action;
+            currentCategory = category;
+            const modal = document.getElementById('customModal');
+            const iconEl = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const descEl = document.getElementById('modalDesc');
+            const inputContainer = document.getElementById('modalInputContainer');
+            const inputEl = document.getElementById('modalInput');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            inputEl.value = '';
+            modal.classList.remove('hidden');
+
+            if (action === 'zeroBalance') {
+                iconEl.className = 'w-12 h-12 bg-amber-950/50 border border-amber-900/50 rounded-2xl flex items-center justify-center mx-auto text-amber-400 text-xl font-bold';
+                iconEl.textContent = '⚠️';
+                titleEl.textContent = 'Bakiyeyi Sıfırla';
+                descEl.textContent = 'Güncel kalan paranı (bakiye) sıfırlamak istediğine emin misin?';
+                inputContainer.classList.add('hidden');
+                confirmBtn.className = 'py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl transition-all shadow-md';
+            } else if (action === 'clear') {
+                iconEl.className = 'w-12 h-12 bg-red-950/50 border border-red-900/50 rounded-2xl flex items-center justify-center mx-auto text-red-400 text-xl font-bold';
+                iconEl.textContent = '⚠️';
+                titleEl.textContent = 'Harcama Geçmişini Temizle';
+                descEl.textContent = 'Tüm bütçe işlem geçmişini temizlemek istediğine emin misin?';
+                inputContainer.classList.add('hidden');
+                confirmBtn.className = 'py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all shadow-md';
+            } else {
+                inputContainer.classList.remove('hidden');
+                setTimeout(() => inputEl.focus(), 50);
+
+                if (action === 'add') {
+                    iconEl.className = 'w-12 h-12 bg-green-950/50 border border-green-900/50 rounded-2xl flex items-center justify-center mx-auto text-green-400 text-xl font-bold';
+                    iconEl.textContent = '➕';
+                    titleEl.textContent = 'Para Ekle';
+                    descEl.textContent = 'Cüzdanınıza ne kadar para eklenecek (TL)?';
+                    confirmBtn.className = 'py-2.5 bg-green-600 hover:bg-green-500 text-white font-bold text-xs rounded-xl transition-all shadow-md';
+                } else if (action === 'sub') {
+                    iconEl.className = 'w-12 h-12 bg-red-950/50 border border-red-900/50 rounded-2xl flex items-center justify-center mx-auto text-red-400 text-xl font-bold';
+                    iconEl.textContent = '❌';
+                    titleEl.textContent = 'Para Eksilt';
+                    descEl.textContent = 'Ne kadar yanlış para eksiltilecek (TL)?';
+                    confirmBtn.className = 'py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl transition-all shadow-md';
+                } else if (action === 'spend') {
+                    iconEl.className = 'w-12 h-12 bg-amber-950/50 border border-amber-900/50 rounded-2xl flex items-center justify-center mx-auto text-amber-400 text-xl font-bold';
+                    iconEl.textContent = '💸';
+                    titleEl.textContent = `${category} Harcaması`;
+                    descEl.textContent = `${category} için ne kadar harcandı (TL)?`;
+                    confirmBtn.className = 'py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition-all shadow-md';
+                }
+            }
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customModal').classList.add('hidden');
+        }
+
+        function modalConfirmAction() {
+            const todayStr = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            if (currentModalAction === 'removeSingleRecord') {
+                records = records.filter(item => item.id !== selectedRecordId);
+                localStorage.setItem('mcan_smoke_records', JSON.stringify(records));
+                updateUI();
+            } else if (currentModalAction === 'removeSingleBudget') {
+                let silinenOge = butceGecmisi.find(item => item.id === selectedBudgetId);
+                if (silinenOge) {
+                    let simdi = new Date();
+                    let saatStr = simdi.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                    let tarihStr = bugununTarihi();
+                    
+                    deletedLogs.unshift({
+                        aciklama: `🗑️ Silinen: ${silinenOge.aciklama}`,
+                        detay: `İşlem Tarihi: ${silinenOge.zaman} | Silinme: ${tarihStr} - ${saatStr}`
+                    });
+                    localStorage.setItem('mcan_deleted_logs', JSON.stringify(deletedLogs));
+                }
+
+                butceGecmisi = butceGecmisi.filter(item => item.id !== selectedBudgetId);
+                localStorage.setItem('mcan_butce_gecmis', JSON.stringify(butceGecmisi));
+                butceEkraniniGuncelle();
+            } else if (currentModalAction === 'zeroBalance') {
+                toplamBakiye = 0;
+                localStorage.setItem('mcan_bakiye', toplamBakiye);
+                butceEkraniniGuncelle();
+            } else if (currentModalAction === 'clearToday') {
+                records = records.filter(r => r.fullDate !== todayStr);
+                localStorage.setItem('mcan_smoke_records', JSON.stringify(records));
+                updateUI();
+            } else if (currentModalAction === 'clearHistory') {
                 records = [];
                 localStorage.removeItem('mcan_smoke_records');
                 updateUI();
+            } else if (currentModalAction === 'clear') {
+                butceGecmisi = [];
+                localStorage.setItem('mcan_butce_gecmis', JSON.stringify(butceGecmisi));
+                butceEkraniniGuncelle();
+            } else {
+                let miktar = parseFloat(document.getElementById('modalInput').value);
+                if (isNaN(miktar) || miktar <= 0) {
+                    alert("Lütfen geçerli bir miktar girin!");
+                    return;
+                }
+
+                let tarih = bugununTarihi();
+
+                if (currentModalAction === 'add') {
+                    toplamBakiye += miktar;
+                    butceGecmisi.unshift({ id: Date.now(), tip: 'giris', aciklama: `➕ ${miktar} TL Eklendi`, zaman: tarih });
+                } else if (currentModalAction === 'sub') {
+                    toplamBakiye -= miktar;
+                    butceGecmisi.unshift({ id: Date.now(), tip: 'cikis', aciklama: `❌ Yanlış Para Eksiltildi: -${miktar} TL`, zaman: tarih });
+                } else if (currentModalAction === 'spend') {
+                    if (miktar > toplamBakiye) {
+                        alert("Kanka kasada o kadar para yok! Önce para eklemen lazım.");
+                        return;
+                    }
+                    toplamBakiye -= miktar;
+                    butceGecmisi.unshift({ id: Date.now(), tip: 'cikis', aciklama: `💸 ${currentCategory}: -${miktar} TL`, zaman: tarih });
+                }
+                butceKaydetVecGuncelle();
+            }
+            closeCustomModal();
+        }
+
+        function clearAllLogs() {
+            deletedLogs = [];
+            localStorage.removeItem('mcan_deleted_logs');
+            logsEkraniniGuncelle();
+        }
+
+        function bugununTarihi() {
+            let simdi = new Date();
+            let gun = String(simdi.getDate()).padStart(2, '0');
+            let ay = String(simdi.getMonth() + 1).padStart(2, '0');
+            let yil = simdi.getFullYear();
+            return `${gun}.${ay}.${yil}`;
+        }
+
+        function butceKaydetVecGuncelle() {
+            localStorage.setItem('mcan_bakiye', toplamBakiye);
+            localStorage.setItem('mcan_butce_gecmis', JSON.stringify(butceGecmisi));
+            butceEkraniniGuncelle();
+        }
+
+        function butceEkraniniGuncelle() {
+            document.getElementById('anaBakiye').innerText = toplamBakiye.toFixed(2) + " TL";
+            let listeEl = document.getElementById('butceGecmisiList');
+            
+            if (butceGecmisi.length === 0) {
+                listeEl.innerHTML = '<div class="text-center py-3 text-gray-500 italic">Henüz işlem yapılmadı.</div>';
+            } else {
+                listeEl.innerHTML = '';
+                butceGecmisi.forEach(islem => {
+                    if (!islem.id) islem.id = Math.random();
+
+                    let renk = islem.tip === 'giris' ? 'text-green-400' : 'text-red-400';
+                    let item = document.createElement('div');
+                    item.className = 'flex justify-between items-center py-2 px-3 bg-[#13151f] rounded-xl border border-[#22263a] gap-2';
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2 truncate">
+                            <button onclick="confirmRemoveBudgetItem(${islem.id})" class="w-6 h-6 bg-red-950/60 hover:bg-red-900 border border-red-900/50 text-red-400 rounded-lg flex items-center justify-center font-bold text-xs transition-all shrink-0" title="Bu işlemi sil">✕</button>
+                            <span class="${renk} font-semibold truncate">${islem.aciklama}</span>
+                        </div>
+                        <span class="text-gray-500 shrink-0">${islem.zaman}</span>
+                    `;
+                    listeEl.appendChild(item);
+                });
+            }
+        }
+
+        function logsEkraniniGuncelle() {
+            let logsEl = document.getElementById('logsList');
+            if (deletedLogs.length === 0) {
+                logsEl.innerHTML = '<div class="text-center py-12 text-gray-500 italic">Henüz silinen işlem yok.</div>';
+            } else {
+                logsEl.innerHTML = '';
+                deletedLogs.forEach(log => {
+                    let item = document.createElement('div');
+                    item.className = 'flex flex-col py-2.5 px-3.5 bg-[#13151f] rounded-xl border border-[#22263a] gap-1';
+                    item.innerHTML = `
+                        <span class="text-red-400 font-semibold text-xs">${log.aciklama}</span>
+                        <span class="text-gray-500 text-[10px]">${log.detay}</span>
+                    `;
+                    logsEl.appendChild(item);
+                });
             }
         }
 
